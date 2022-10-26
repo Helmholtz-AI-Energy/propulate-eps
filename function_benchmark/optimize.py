@@ -28,25 +28,33 @@ def variable_propulate():
     fname = os.environ["FNAME"]
     # assuming 72 procs on 2 nodes!!! (144 CPUs)
     # this is divisible by 4 (for the NN stuff later)
-    islands = [  1,  2,  4,  8, 16, 36]
-    # equals  [144, 72, 36, 18,  9,  4]
-    migrations_prob = [0.01, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.99]
+    islands = [  2,  4,  8, 16, 36]
+    # equals  [ 72, 36, 18,  9,  4]
+    migrations_prob = [0.01, 0.10, 0.30, 0.50, 0.70, 0.90, 0.99]
     pollination = [True, False]
+    mate_prob = [0.1, 0.325, 0.55, 0.775]
+    mut_prob = [0.1, 0.325, 0.55, 0.775]
+    rand_prob = [0.1, 0.325, 0.55, 0.775]
 
-    for isl, mig, pol in itertools.product(islands, migrations_prob, pollination):
+    for isl, mig, pol, mate, mut, rand in itertools.product(
+            islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
+    ):
         MPI.COMM_WORLD.Barrier()
         print(f"starting islands, migration, pollination: {isl}, {mig}, {pol}")
-        functions.propulate_objective(
+        best = functions.propulate_objective(
             fname=fname,
             num_islands=isl,
             migration_prob=mig,
             pollination=pol,
-            mate_prob=0.7,
-            mut_prob=0.4,
+            mate_prob=mate,
+            mut_prob=mut,
             random_prob=0.1,
         )
         MPI.COMM_WORLD.Barrier()
+        if MPI.COMM_WORLD.rank == 0:
+            print(best)
         print(f"Finished islands, migration, pollination: {isl}, {mig}, {pol}")
+
 
 def optimize_propulate():
     job_id = int(os.environ["SLURM_JOBID"])

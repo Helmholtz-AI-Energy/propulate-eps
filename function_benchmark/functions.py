@@ -327,11 +327,12 @@ def propulate_objective(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
         f"search/{fname}/checkpoints/"
         f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
+        f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
     )
     checkpoint.mkdir(exist_ok=True, parents=True)
     checkpoint = str(checkpoint / "pop_cpt.p")
 
-    num_gens = 512
+    num_gens = 256
 
     rng = random.Random(int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
 
@@ -369,10 +370,10 @@ def propulate_objective(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
         f"search/{fname}/results/"
         f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
+        f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
     )
     out_loc.mkdir(exist_ok=True, parents=True)
     best = islands.evolve(top_n=1, logging_interval=1, DEBUG=1, out_file=out_loc / "summary.png")
-
     old_data = {}
     try:
         old_data = json.loads(full_dict.read_text())
@@ -381,3 +382,4 @@ def propulate_objective(
 
     old_data[f"pop{pop_size}-islands{num_islands}-migprob{migration_prob}"] = best
     full_dict.write_text(json.dumps(old_data, indent=4))
+    return best

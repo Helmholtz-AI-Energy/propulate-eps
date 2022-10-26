@@ -23,7 +23,7 @@ SRUN_PARAMS=(
   --label
 #  --cpu-bind="ldoms"
 )
-export FRAMEWORK="optuna"
+export FRAMEWORK="propulate-scan"
 export EVALS_PER_WORKER=100
 
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
