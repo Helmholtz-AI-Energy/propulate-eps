@@ -3,8 +3,16 @@ import time
 import random
 import sys
 import os
+from pathlib import Path
+
+import itertools
 
 import functions
+from propulate.utils import get_default_propagator
+from propulate.propagators import SelectBest, SelectWorst
+
+from propulate import Islands
+from mpi4py import MPI
 
 #def objective(trial):
 #    """Sphere benchmark function."""
@@ -15,13 +23,38 @@ import functions
 #    time.sleep(random.uniform(lower_sleep, upper_sleep))
 #    return a**2 + b**2
 
+
+def variable_propulate():
+    fname = os.environ["FNAME"]
+    # assuming 72 procs on 2 nodes!!! (144 CPUs)
+    # this is divisible by 4 (for the NN stuff later)
+    islands = [  1,  2,  4,  8, 16, 36]
+    # equals  [144, 72, 36, 18,  9,  4]
+    migrations_prob = [0.01, 0.10, 0.20, 0.30, 0.40, 0.50, 0.60, 0.70, 0.80, 0.90, 0.99]
+    pollination = [True, False]
+
+    for isl, mig, pol in itertools.product(islands, migrations_prob, pollination):
+        MPI.COMM_WORLD.Barrier()
+        print(f"starting islands, migration, pollination: {isl}, {mig}, {pol}")
+        functions.propulate_objective(
+            fname=fname,
+            num_islands=isl,
+            migration_prob=mig,
+            pollination=pol,
+            mate_prob=0.7,
+            mut_prob=0.4,
+            random_prob=0.1,
+        )
+        MPI.COMM_WORLD.Barrier()
+        print(f"Finished islands, migration, pollination: {isl}, {mig}, {pol}")
+
 def optimize_propulate():
     job_id = int(os.environ["SLURM_JOBID"])
     seed = job_id  # int(os.environ["SEED"])
     #int(job_id) + os.getpid()
     fname = os.environ["FNAME"]
     n_trials = 1000
-    func, limits = get_limits(fname)
+    func, limits = functions.get_limits(fname)
     rng = random.Random(int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
     #print(rng)
     # TODO: pop size, num_generations
@@ -32,12 +65,10 @@ def optimize_propulate():
     checkpoint = Path(f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/{fname}/checkpoints/")  / os.environ["SLURM_JOBID"]
     checkpoint.mkdir(exist_ok=True, parents=True)
     checkpoint = str(checkpoint / "pop_cpt.p")
-    
-    func, limits = get_limits(fname)
 
     propagator = get_default_propagator(pop_size, limits, 0.7, 0.4, 0.1, rng=rng)
     islands = Islands(
-        train,
+        func,
         propagator,
         generations=num_gens,
         num_isles=int(islands),
@@ -53,11 +84,9 @@ def optimize_propulate():
     islands.evolve(top_n=1, logging_interval=1, DEBUG=1)
 
 
-if __name__ == "__main__":
-    from mpi4py import MPI
-
+def main():
     rank = MPI.COMM_WORLD.rank
-    
+
     job_id = int(os.environ["SLURM_JOBID"])
     seed = job_id  # int(os.environ["SEED"])
     #int(job_id) + os.getpid()
@@ -68,6 +97,8 @@ if __name__ == "__main__":
     print(f"framework: {framework} function: {fname}\ttrials: {n_trials}\tseed: {seed}")
     if framework == "propulate":
         return optimize_propulate()
+    elif framework == "propulate-scan":
+        return variable_propulate()
     # below is only optuna ==================================
     if n_trials == -1:
         n_trials = None
@@ -81,10 +112,6 @@ if __name__ == "__main__":
     sampler = optuna.samplers.TPESampler(seed=seed)
 
     if rank == 0:
-        #optuna.delete_study(
-        #    study_name=fname,  # "sphere", 
-        #    storage=f"mysql://root:1234@{host}/{storage}",
-        #)
         optuna.create_study(
             study_name=f"{fname}-{seed}",  # "sphere", 
             storage=f"mysql://root:1234@{host}/{storage}", 
@@ -97,13 +124,12 @@ if __name__ == "__main__":
     
     study = optuna.load_study(
         study_name=f"{fname}-{seed}",  # "sphere",
-        storage=f"mysql://root:1234@{host}/{storage}",     #f"mysql://{user}@{host}/{storage}",
+        storage=f"mysql://root:1234@{host}/{storage}",
         sampler=sampler,
     )
 
     study.optimize(
         lambda trial: functions.optuna_objective(trial=trial, fname=fname),
-            #functions.optisphere,  #            objective
         n_trials=n_trials,
     )
     
@@ -133,3 +159,7 @@ if __name__ == "__main__":
 # - Instantiate `study` object.
 # - Start optimization with `study.optimize`, specifying number
 #   of trials with `n_trials`.
+
+
+if __name__ == "__main__":
+    main()

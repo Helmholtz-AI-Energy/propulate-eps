@@ -1,6 +1,15 @@
 #!/usr/bin/env python3
 import numpy as np
 import optuna
+import sys
+from pathlib import Path
+import os
+from propulate.utils import get_default_propagator
+from propulate.propagators import SelectBest, SelectWorst
+from propulate import Islands
+import random
+from mpi4py import MPI
+import json
 
 #################################
 # PROPULATE FUNCTION BENCHMARKS #
@@ -301,3 +310,74 @@ def optuna_objective(trial, fname):
     
     return func(opt_dict)
 
+
+def propulate_objective(
+    fname,
+    num_islands,
+    migration_prob,
+    pollination=True,
+    mate_prob=0.7,
+    mut_prob=0.4,
+    random_prob=0.1
+):
+    func, limits = get_limits(fname)
+    pop_size = MPI.COMM_WORLD.size // num_islands
+    # checkpoint file is only for saving
+    checkpoint = Path(
+        f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
+        f"search/{fname}/checkpoints/"
+        f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
+    )
+    checkpoint.mkdir(exist_ok=True, parents=True)
+    checkpoint = str(checkpoint / "pop_cpt.p")
+
+    num_gens = 512
+
+    rng = random.Random(int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
+
+    propagator = get_default_propagator(
+        pop_size=pop_size,
+        limits=limits,
+        mate_prob=mate_prob,
+        mut_prob=mut_prob,
+        random_prob=random_prob,
+        rng=rng
+    )
+    islands = Islands(
+        func,
+        propagator,
+        generations=num_gens,
+        num_isles=num_islands,
+        rng=rng,
+        # isle_sizes=[4, 4, 4, 4],  # migration_topology=migration_topology,
+        load_checkpoint="nothing",  # pop_cpt.p",
+        save_checkpoint=checkpoint,
+        migration_probability=migration_prob,
+        emigration_propagator=SelectBest,
+        immigration_propagator=SelectWorst,
+        pollination=pollination,
+    )
+
+    full_dict_loc = Path(
+        f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
+        f"search/{fname}/results/overall/"
+    )
+    full_dict_loc.mkdir(exist_ok=True, parents=True)
+    full_dict = full_dict_loc / "search_results.txt"
+
+    out_loc = Path(
+        f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
+        f"search/{fname}/results/"
+        f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
+    )
+    out_loc.mkdir(exist_ok=True, parents=True)
+    best = islands.evolve(top_n=1, logging_interval=1, DEBUG=1, out_file=out_loc / "summary.png")
+
+    old_data = {}
+    try:
+        old_data = json.loads(full_dict.read_text())
+    except FileNotFoundError:
+        print("No file was found!, creating one")
+
+    old_data[f"pop{pop_size}-islands{num_islands}-migprob{migration_prob}"] = best
+    full_dict.write_text(json.dumps(old_data, indent=4))
