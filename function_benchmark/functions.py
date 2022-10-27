@@ -329,6 +329,9 @@ def propulate_objective(
         f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
         f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
     )
+    rank = MPI.COMM_WORLD.rank
+    if rank == 0:
+        print("checkpoint path:", checkpoint)
     checkpoint.mkdir(exist_ok=True, parents=True)
     checkpoint = str(checkpoint / "pop_cpt.p")
 
@@ -373,7 +376,14 @@ def propulate_objective(
         f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
     )
     out_loc.mkdir(exist_ok=True, parents=True)
-    best = islands.evolve(top_n=1, logging_interval=1, DEBUG=1, out_file=out_loc / "summary.png")
+    if rank == 0:
+        print("out logs:", out_loc)
+
+    best = islands.evolve(top_n=1, logging_interval=100, DEBUG=0, out_file=out_loc / "summary.png")
+    # TODO: need to record when the peak is reached!
+
+
+    # best = islands.propulator.summarize(top_n=3, out_file=out_loc / "summary.png", DEBUG=1)
     old_data = {}
     try:
         old_data = json.loads(full_dict.read_text())

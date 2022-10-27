@@ -35,12 +35,14 @@ def variable_propulate():
     mate_prob = [0.1, 0.325, 0.55, 0.775]
     mut_prob = [0.1, 0.325, 0.55, 0.775]
     rand_prob = [0.1, 0.325, 0.55, 0.775]
+    rank = MPI.COMM_WORLD.Barrier()
 
     for isl, mig, pol, mate, mut, rand in itertools.product(
             islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
     ):
         MPI.COMM_WORLD.Barrier()
-        print(f"starting islands, migration, pollination: {isl}, {mig}, {pol}")
+        if rank == 0:
+            print(f"starting islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: {mate}\tmut_prob: {mut}\trand_prob: {rand}")
         best = functions.propulate_objective(
             fname=fname,
             num_islands=isl,
@@ -53,7 +55,7 @@ def variable_propulate():
         MPI.COMM_WORLD.Barrier()
         if MPI.COMM_WORLD.rank == 0:
             print(best)
-        print(f"Finished islands, migration, pollination: {isl}, {mig}, {pol}")
+            print(f"Finished islands, migration, pollination: {isl}, {mig}, {pol}")
 
 
 def optimize_propulate():
