@@ -10,6 +10,7 @@ from propulate import Islands
 import random
 from mpi4py import MPI
 import json
+import heapq
 
 #################################
 # PROPULATE FUNCTION BENCHMARKS #
@@ -330,6 +331,7 @@ def propulate_objective(
         f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
     )
     rank = MPI.COMM_WORLD.rank
+    size = MPI.COMM_WORLD.size
     if rank == 0:
         print("checkpoint path:", checkpoint)
     checkpoint.mkdir(exist_ok=True, parents=True)
@@ -379,17 +381,31 @@ def propulate_objective(
     if rank == 0:
         print("out logs:", out_loc)
 
-    best = islands.evolve(top_n=1, logging_interval=100, DEBUG=0, out_file=out_loc / "summary.png")
+    best = islands.evolve(top_n=3, logging_interval=100, DEBUG=0, out_file=out_loc / "summary.png")
     # TODO: need to record when the peak is reached!
+    gens = [x.generation for x in islands.propagator.population]
+    ls = [x.loss for x in islands.propagator.population]
+    # rn = [x.rank for x in islands.propagator.population]
 
+    island_size = size // islands
+    island_rank = rank % island_size
+    island_id = rank // island_size
+    if island_rank == 0:
+        # get the top 1 best from the island and their indices
+        bottomk_ls = heapq.nsmallest(3, ls)  # best 3
+        argbotk = [ls.index(i) for i in bottomk_ls]  # indexes of the best 3
+        botk_gens = [gens[i] for i in argbotk]  # generation of best 3
+        pnt_str = [{"ls": i, "gen": g} for i, g in zip([ls[i] for i in argbotk], botk_gens)]
+        print(f"Island: {island_id} - Best 3 results: {pnt_str}")
 
     # best = islands.propulator.summarize(top_n=3, out_file=out_loc / "summary.png", DEBUG=1)
-    old_data = {}
-    try:
-        old_data = json.loads(full_dict.read_text())
-    except FileNotFoundError:
-        print("No file was found!, creating one")
+    if rank == 0:
+        old_data = {}
+        try:
+            old_data = json.loads(full_dict.read_text())
+        except FileNotFoundError:
+            print("No file was found!, creating one")
 
-    old_data[f"pop{pop_size}-islands{num_islands}-migprob{migration_prob}"] = best
-    full_dict.write_text(json.dumps(old_data, indent=4))
+        old_data[f"pop{pop_size}-islands{num_islands}-migprob{migration_prob}"] = best
+        full_dict.write_text(json.dumps(old_data, indent=4))
     return best

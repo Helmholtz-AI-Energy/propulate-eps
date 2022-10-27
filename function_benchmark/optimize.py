@@ -26,6 +26,7 @@ from mpi4py import MPI
 
 def variable_propulate():
     fname = os.environ["FNAME"]
+    
     # assuming 72 procs on 2 nodes!!! (144 CPUs)
     # this is divisible by 4 (for the NN stuff later)
     islands = [  2,  4,  8, 16, 36]
@@ -35,15 +36,17 @@ def variable_propulate():
     mate_prob = [0.1, 0.325, 0.55, 0.775]
     mut_prob = [0.1, 0.325, 0.55, 0.775]
     rand_prob = [0.1, 0.325, 0.55, 0.775]
-    rank = MPI.COMM_WORLD.Barrier()
+    rank = MPI.COMM_WORLD.rank
+    size = MPI.COMM_WORLD.size  # should be 144
 
     for isl, mig, pol, mate, mut, rand in itertools.product(
             islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
     ):
         MPI.COMM_WORLD.Barrier()
         if rank == 0:
-            print(f"starting islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: {mate}\tmut_prob: {mut}\trand_prob: {rand}")
-        best = functions.propulate_objective(
+            print(f"starting islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: "
+                  f"{mate}\tmut_prob: {mut}\trand_prob: {rand}")
+        functions.propulate_objective(
             fname=fname,
             num_islands=isl,
             migration_prob=mig,
@@ -53,9 +56,11 @@ def variable_propulate():
             random_prob=0.1,
         )
         MPI.COMM_WORLD.Barrier()
-        if MPI.COMM_WORLD.rank == 0:
-            print(best)
-            print(f"Finished islands, migration, pollination: {isl}, {mig}, {pol}")
+
+        if rank == 0:
+            # print(best)
+            print(f"Finished islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: "
+                  f"{mate}\tmut_prob: {mut}\trand_prob: {rand}")
 
 
 def optimize_propulate():
