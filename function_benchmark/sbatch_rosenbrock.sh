@@ -55,6 +55,7 @@ export NCCL_COLLNET_ENABLE=0
 srun "${SRUN_PARAMS[@]}" singularity exec --nv \
   --bind "${BASE_DIR}","${DATA_DIR}","/scratch","$TMP",${SQL_DATA_DIR}:/var/lib/mysql,${SQL_SOCKET_DIR}:/run/mysqld \
   --bind "${SQL_SOCKET_DIR}/var/log/mysql/":/var/log/mysql \
+  --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/wrapper.py":"/usr/local/lib/python3.8/dist-packages/propulate/wrapper.py" \
   ${SINGULARITY_FILE} \
   bash optuna.sh
 

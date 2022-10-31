@@ -328,7 +328,7 @@ def propulate_objective(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
         f"search/{fname}/checkpoints/"
         f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
-        f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
+        f"-mate{mate_prob}-mut{mut_prob}-rand{random_prob}"
     )
     rank = MPI.COMM_WORLD.rank
     size = MPI.COMM_WORLD.size
@@ -375,7 +375,7 @@ def propulate_objective(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
         f"search/{fname}/results/"
         f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
-        f"-mate{mate_prob}-mut{mut_prob}-{random_prob}"
+        f"-mate{mate_prob}-mut{mut_prob}-rand{random_prob}"
     )
     out_loc.mkdir(exist_ok=True, parents=True)
     if rank == 0:
@@ -383,11 +383,11 @@ def propulate_objective(
 
     best = islands.evolve(top_n=3, logging_interval=100, DEBUG=0, out_file=out_loc / "summary.png")
     # TODO: need to record when the peak is reached!
-    gens = [x.generation for x in islands.propagator.population]
-    ls = [x.loss for x in islands.propagator.population]
+    gens = [x.generation for x in islands.propulator.population]
+    ls = [x.loss for x in islands.propulator.population]
     # rn = [x.rank for x in islands.propagator.population]
 
-    island_size = size // islands
+    island_size = size // num_islands
     island_rank = rank % island_size
     island_id = rank // island_size
     if island_rank == 0:
@@ -398,6 +398,22 @@ def propulate_objective(
         pnt_str = [{"ls": i, "gen": g} for i, g in zip([ls[i] for i in argbotk], botk_gens)]
         print(f"Island: {island_id} - Best 3 results: {pnt_str}")
 
+        # send results to rank 0
+        comm = MPI.COMM_WORLD
+        if rank == 0:
+            island_out_dict = {}
+            island_out_dict[0] = pnt_str
+            for rcv in range(1, num_islands):
+                rcv_rank = rcv * island_size
+                lp_res = comm.recv(source=rcv_rank)
+                island_out_dict[rcv] = lp_res
+            island_out_dict["best"] = best
+        if rank != 0:
+            comm.send(pnt_str, dest=0)
+
+
+
+
     # best = islands.propulator.summarize(top_n=3, out_file=out_loc / "summary.png", DEBUG=1)
     if rank == 0:
         old_data = {}
@@ -406,6 +422,6 @@ def propulate_objective(
         except FileNotFoundError:
             print("No file was found!, creating one")
 
-        old_data[f"pop{pop_size}-islands{num_islands}-migprob{migration_prob}"] = best
+        old_data[f"pop-{pop_size}-islands-{num_islands}-migprob-{migration_prob}-mate-{mate_prob}-mut-{mut_prob}-rand-{random_prob}"] = island_out_dict
         full_dict.write_text(json.dumps(old_data, indent=4))
     return best

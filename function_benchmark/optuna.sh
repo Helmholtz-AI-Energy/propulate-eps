@@ -6,7 +6,7 @@ echo "$SLURM_SRUN_COMM_HOST $SLURM_LAUNCH_NODE_IPADDR"
 
 
 # only need this for optuna...
-if [ "$SLURM_PROCID" == "0" && "$FRAMEWORK" == "optuna"]
+if [ "$SLURM_PROCID" == "0" && "$FRAMEWORK" == "optuna" ]
 then
   mysqld_safe --defaults-file="$SQL_CONFIG" & #--bind-address $SLURM_LAUNCH_NODE_IPADDR &
   sleep 3

@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
 # Slurm job configuration
-## #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=4
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=72
 #SBATCH --gpus-per-task=0
-#SBATCH --time=2:00:00
+#SBATCH --time=47:00:00
 #SBATCH --partition=cpuonly
 #SBATCH --account=haicore-project-scc
 
-#SBATCH --job-name=optuna-birastrigin
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/optuna-%j.out"
-## #SBATCH --job-name=propulate-birastrigin
-## #SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/propulate-%j.out"
+##SBATCH --job-name=optuna-birastrigin
+##SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/optuna-%j.out"
+#SBATCH --job-name=propulate-birastrigin
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/propulate-%j.out"
 
 ml purge
 
@@ -25,7 +25,9 @@ SRUN_PARAMS=(
 )
 
 #export STRONGWEAK="time"
-export FRAMEWORK="optuna"
+#export FRAMEWORK="optuna"
+export FRAMEWORK="propulate-scan"
+
 export EVALS_PER_WORKER=100
 
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
@@ -58,6 +60,7 @@ srun "${SRUN_PARAMS[@]}" singularity exec --nv \
   --bind "${BASE_DIR}","${DATA_DIR}","/scratch","$TMP",${SQL_DATA_DIR}:/var/lib/mysql,${SQL_SOCKET_DIR}:/run/mysqld \
   --bind "${SQL_SOCKET_DIR}/var/log/mysql/":/var/log/mysql \
   --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/wrapper.py":"/usr/local/lib/python3.8/dist-packages/propulate/wrapper.py" \
+  --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/propulator.py":"/usr/local/lib/python3.8/dist-packages/propulate/propulator.py" \
   ${SINGULARITY_FILE} \
   bash optuna.sh
 

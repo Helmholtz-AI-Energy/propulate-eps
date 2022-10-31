@@ -29,7 +29,7 @@ def variable_propulate():
     
     # assuming 72 procs on 2 nodes!!! (144 CPUs)
     # this is divisible by 4 (for the NN stuff later)
-    islands = [  2,  4,  8, 16, 36]
+    islands = [16, 36]  # [  2,  4,  8, 16, 36]
     # equals  [ 72, 36, 18,  9,  4]
     migrations_prob = [0.01, 0.10, 0.30, 0.50, 0.70, 0.90, 0.99]
     pollination = [True, False]
