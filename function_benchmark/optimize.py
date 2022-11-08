@@ -29,9 +29,9 @@ def variable_propulate():
     
     # assuming 72 procs on 2 nodes!!! (144 CPUs)
     # this is divisible by 4 (for the NN stuff later)
-    islands = [36]  # [  2,  4,  8, 16, 36]
+    islands = [  2,  4,  8, 16, 36]
     # equals  [ 72, 36, 18,  9,  4]
-    migrations_prob = [0.01, 0.10, 0.30, 0.50, 0.70, 0.90, 0.99]
+    migrations_prob = [0.01, 0.10, 0.30, 0.50, 0.70, 0.90]  # , 0.99]
     pollination = [True, False]
     mate_prob = [0.1, 0.325, 0.55, 0.775]
     mut_prob = [0.1, 0.325, 0.55, 0.775]
@@ -43,7 +43,7 @@ def variable_propulate():
         islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
     ))
 
-    st = lst.index((36, 0.99, True, 0.1, 0.1, 0.1))
+    st = 0  # lst.index((36, 0.99, True, 0.1, 0.1, 0.1))
 
     #for isl, mig, pol, mate, mut, rand in itertools.product(
     #        islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob

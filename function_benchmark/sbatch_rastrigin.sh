@@ -11,7 +11,7 @@
 # #SBATCH --job-name=optuna-rastrigin
 # #SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/optuna-%j.out"
 #SBATCH --job-name=propulate-rastrigin
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/propulate-%j.out"
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/propulate-2-%j.out"
 
 ml purge
 
@@ -38,7 +38,7 @@ touch "$SQL_SOCKET"
 #export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_SOCKET_DIR="${BASE_DIR}bigearthnet_kit/mysql/"
 
-export SEED="${RANDOM}"
+export SEED=42
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"
