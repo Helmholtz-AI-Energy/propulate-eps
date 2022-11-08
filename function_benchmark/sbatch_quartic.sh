@@ -10,8 +10,8 @@
 
 ###SBATCH --job-name=optuna-quartic
 ###SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/quartic/optuna-%j.out"
-#SBATCH --job-name=propulate-quartice
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/quartic/propulate-2-%j.out"
+#SBATCH --job-name=propulate-quartice-islands36
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/quartic/propulate-2-islands36-%j.out"
 
 ml purge
 

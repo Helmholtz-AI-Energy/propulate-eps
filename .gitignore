@@ -2,3 +2,4 @@
 *.p
 *.db*
 */results/*
+*/logs/*

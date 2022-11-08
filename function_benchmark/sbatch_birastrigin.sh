@@ -10,8 +10,8 @@
 
 ##SBATCH --job-name=optuna-birastrigin
 ##SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/optuna-%j.out"
-#SBATCH --job-name=propulate-birastrigin
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/propulate-2-%j.out"
+#SBATCH --job-name=propulate-birastrigin-islands36
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/birastrigin/propulate-2-islands36-%j.out"
 
 ml purge
 
