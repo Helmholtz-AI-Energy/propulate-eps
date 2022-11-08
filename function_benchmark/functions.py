@@ -369,12 +369,12 @@ def propulate_objective(
         f"search/{fname}/results/overall/"
     )
     full_dict_loc.mkdir(exist_ok=True, parents=True)
-    full_dict = full_dict_loc / "search_results.txt"
+    full_dict = full_dict_loc / "search_results2.txt"
 
     out_loc = Path(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
         f"search/{fname}/results/"
-        f"{os.environ['SLURM_JOBID']}-pop{pop_size}-islands{num_islands}-migprob{migration_prob}"
+        f"{os.environ['SLURM_JOBID']}-pop{pop_size}-poll{pollination}-islands{num_islands}-migprob{migration_prob}"
         f"-mate{mate_prob}-mut{mut_prob}-rand{random_prob}"
     )
     out_loc.mkdir(exist_ok=True, parents=True)
@@ -422,6 +422,6 @@ def propulate_objective(
         except FileNotFoundError:
             print("No file was found!, creating one")
 
-        old_data[f"pop-{pop_size}-islands-{num_islands}-migprob-{migration_prob}-mate-{mate_prob}-mut-{mut_prob}-rand-{random_prob}"] = island_out_dict
+        old_data[f"pop-{pop_size}-poll{pollination}-islands-{num_islands}-migprob-{migration_prob}-mate-{mate_prob}-mut-{mut_prob}-rand-{random_prob}"] = island_out_dict
         full_dict.write_text(json.dumps(old_data, indent=4))
     return best
