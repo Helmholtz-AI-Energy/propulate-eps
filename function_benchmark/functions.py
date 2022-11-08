@@ -51,7 +51,8 @@ def quartic(params):
     vec = np.array(list(params.values()))
     idx = np.arange(1, len(vec)+1)
     gauss = np.random.normal(size = len(vec))
-    return np.sum(idx * vec**4 + gauss)
+    ret = np.sum(idx * vec**4 + gauss)
+    return abs(ret)
 
 # F5: RASTRIGIN
 # Use N_dim = 20.
