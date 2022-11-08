@@ -29,7 +29,7 @@ def variable_propulate():
     
     # assuming 72 procs on 2 nodes!!! (144 CPUs)
     # this is divisible by 4 (for the NN stuff later)
-    islands = [16, 36]  # [  2,  4,  8, 16, 36]
+    islands = [36]  # [  2,  4,  8, 16, 36]
     # equals  [ 72, 36, 18,  9,  4]
     migrations_prob = [0.01, 0.10, 0.30, 0.50, 0.70, 0.90, 0.99]
     pollination = [True, False]
@@ -39,9 +39,16 @@ def variable_propulate():
     rank = MPI.COMM_WORLD.rank
     size = MPI.COMM_WORLD.size  # should be 144
 
-    for isl, mig, pol, mate, mut, rand in itertools.product(
-            islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
-    ):
+    lst = list(itertools.product(
+        islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
+    ))
+
+    st = lst.index((36, 0.99, True, 0.1, 0.1, 0.1))
+
+    #for isl, mig, pol, mate, mut, rand in itertools.product(
+    #        islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
+    #):
+    for isl, mig, pol, mate, mut, rand in lst[st:]:
         MPI.COMM_WORLD.Barrier()
         if rank == 0:
             print(f"starting islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: "
@@ -65,13 +72,13 @@ def variable_propulate():
 
 def optimize_propulate():
     job_id = int(os.environ["SLURM_JOBID"])
-    seed = job_id  # int(os.environ["SEED"])
+    seed = int(os.environ["SEED"])
     #int(job_id) + os.getpid()
     fname = os.environ["FNAME"]
     n_trials = 1000
     func, limits = functions.get_limits(fname)
-    rng = random.Random(int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
-    #print(rng)
+    rng = random.Random(seed + MPI.COMM_WORLD.rank)  # int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
+    print(seed)
     # TODO: pop size, num_generations
     pop_size = MPI.COMM_WORLD.size
     num_gens = int(os.environ["EVALS_PER_WORKER"])
