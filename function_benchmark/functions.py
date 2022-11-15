@@ -169,10 +169,10 @@ def get_limits(fname):
             "x": (-1.28, 1.28),
             "y": (-1.28, 1.28),
             "z": (-1.28, 1.28),
-            "A": (-1.28, 1.28),
-            "B": (-1.28, 1.28),
-            "C": (-1.28, 1.28),
-            "D": (-1.28, 1.28)
+            "A1": (-1.28, 1.28),
+            "B1": (-1.28, 1.28),
+            "C1": (-1.28, 1.28),
+            "D1": (-1.28, 1.28)
         }
     
     elif fname == "bisphere":
@@ -204,10 +204,10 @@ def get_limits(fname):
             "x": (-5.12, 5.12),
             "y": (-5.12, 5.12),
             "z": (-5.12, 5.12),
-            "A": (-5.12, 5.12),
-            "B": (-5.12, 5.12),
-            "C": (-5.12, 5.12),
-            "D": (-5.12, 5.12)
+            "A1": (-5.12, 5.12),
+            "B1": (-5.12, 5.12),
+            "C1": (-5.12, 5.12),
+            "D1": (-5.12, 5.12)
         }
     
     elif fname == "birastrigin":
@@ -239,10 +239,10 @@ def get_limits(fname):
             "x": (-5.12, 5.12),
             "y": (-5.12, 5.12),
             "z": (-5.12, 5.12),
-            "A": (-5.12, 5.12),
-            "B": (-5.12, 5.12),
-            "C": (-5.12, 5.12),
-            "D": (-5.12, 5.12)
+            "A1": (-5.12, 5.12),
+            "B1": (-5.12, 5.12),
+            "C1": (-5.12, 5.12),
+            "D1": (-5.12, 5.12)
         }
     
     elif fname == "rastrigin":
@@ -309,6 +309,7 @@ def optuna_objective(trial, fname):
     
     opt_dict = {}
     for k in limits:
+        #print(k)
         opt_dict[k] = trial.suggest_float(k, *limits[k])
     
     return func(opt_dict)
@@ -371,7 +372,7 @@ def propulate_objective(
         f"search/{fname}/results/overall/"
     )
     full_dict_loc.mkdir(exist_ok=True, parents=True)
-    full_dict = full_dict_loc / "search_results-2.txt"
+    full_dict = full_dict_loc / "search_results-3.txt"
 
     out_loc = Path(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
@@ -401,28 +402,28 @@ def propulate_objective(
         print(f"Island: {island_id} - Best 3 results: {pnt_str}")
 
         # send results to rank 0
-        comm = MPI.COMM_WORLD
-        if rank == 0:
-            island_out_dict = {}
-            island_out_dict[0] = pnt_str
-            for rcv in range(1, num_islands):
-                rcv_rank = rcv * island_size
-                lp_res = comm.recv(source=rcv_rank)
-                island_out_dict[rcv] = lp_res
-            island_out_dict["best"] = best
-        if rank != 0:
-            comm.send(pnt_str, dest=0)
+        #comm = MPI.COMM_WORLD
+        #if rank == 0:
+        #    island_out_dict = {}
+        #    island_out_dict[0] = pnt_str
+        #    for rcv in range(1, num_islands):
+        #        rcv_rank = rcv * island_size
+        #        lp_res = comm.recv(source=rcv_rank)
+        #        island_out_dict[rcv] = lp_res
+        #    island_out_dict["best"] = best
+        #if rank != 0:
+        #    comm.send(pnt_str, dest=0)
 
     # best = islands.propulator.summarize(top_n=3, out_file=out_loc / "summary.png", DEBUG=1)
-    if rank == 0:
-        old_data = {}
-        try:
-            old_data = json.loads(full_dict.read_text())
-        except FileNotFoundError:
-            print("No file was found!, creating one")
+    #if rank == 0:
+        #old_data = {}
+        #try:
+        #    old_data = json.loads(full_dict.read_text())
+        #except FileNotFoundError:
+        #    print("No file was found!, creating one")
 
-        old_data[f"pop-{pop_size}-poll{pollination}-islands-{num_islands}" \
-                 f"-migprob-{migration_prob}-mate-{mate_prob}-mut-{mut_prob}-rand-{random_prob}"] \
-            = island_out_dict
-        full_dict.write_text(json.dumps(old_data, indent=4))
+    #    old_data[f"pop-{pop_size}-poll{pollination}-islands-{num_islands}" \
+    #             f"-migprob-{migration_prob}-mate-{mate_prob}-mut-{mut_prob}-rand-{random_prob}"] \
+    #        = island_out_dict
+    #    full_dict.write_text(json.dumps(old_data, indent=4))
     return best

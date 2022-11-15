@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
 # Slurm job configuration
-## #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=70
+#SBATCH --nodes=2
+#SBATCH --ntasks-per-node=72
 #SBATCH --gpus-per-task=0
 #SBATCH --time=2:00:00
-#SBATCH --partition=cpuonly
+#SBATCH --partition=accelerated
+#SBATCH --gres gpu:1
 #SBATCH --account=haicore-project-scc
 
 #SBATCH --job-name=optuna-sphere
@@ -25,7 +26,7 @@ SRUN_PARAMS=(
 )
 
 export FRAMEWORK="optuna"
-export EVALS_PER_WORKER=100
+export EVALS_PER_WORKER=256
 
 
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
@@ -54,10 +55,11 @@ export NCCL_COLLNET_ENABLE=0
 
 #singularity instance start --bind ${SQL_DATA_DIR}:/var/lib/mysql --bind ${SQL_SOCKET_DIR}:/run/mysqld "${SINGULARITY_FILE}" mysql
 
-srun "${SRUN_PARAMS[@]}" singularity exec --nv \
+srun "${SRUN_PARAMS[@]}" singularity exec \
   --bind "${BASE_DIR}","${DATA_DIR}","/scratch","$TMP",${SQL_DATA_DIR}:/var/lib/mysql,${SQL_SOCKET_DIR}:/run/mysqld \
   --bind "${SQL_SOCKET_DIR}/var/log/mysql/":/var/log/mysql \
   --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/wrapper.py":"/usr/local/lib/python3.8/dist-packages/propulate/wrapper.py" \
+  --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/propulator.py":"/usr/local/lib/python3.8/dist-packages/propulate/propulator.py" \
   ${SINGULARITY_FILE} \
   bash optuna.sh
 

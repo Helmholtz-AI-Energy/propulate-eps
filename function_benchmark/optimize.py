@@ -29,7 +29,8 @@ def variable_propulate():
     
     # assuming 72 procs on 2 nodes!!! (144 CPUs)
     # this is divisible by 4 (for the NN stuff later)
-    islands = [  36]  # [  2,  4,  8, 16, 36]
+    islands_to_run = int(os.environ["ISLANDS"])
+    islands = [  islands_to_run]  # [  2,  4,  8, 16, 36]
     # equals  [ 72, 36, 18,  9,  4]
     migrations_prob = [0.01, 0.10, 0.30, 0.50, 0.70, 0.90]  # , 0.99]
     pollination = [True, False]
@@ -42,8 +43,10 @@ def variable_propulate():
     lst = list(itertools.product(
         islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
     ))
+    print(lst[0])
 
-    st = 0  # lst.index((36, 0.99, True, 0.1, 0.1, 0.1))
+    st = 0  # 
+    #st = lst.index((36, 0.9, True, 0.775, 0.55, 0.55))
 
     #for isl, mig, pol, mate, mut, rand in itertools.product(
     #        islands, migrations_prob, pollination, mate_prob, mut_prob, rand_prob
@@ -53,6 +56,7 @@ def variable_propulate():
         if rank == 0:
             print(f"starting islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: "
                   f"{mate}\tmut_prob: {mut}\trand_prob: {rand}")
+            t1 = time.perf_counter()
         functions.propulate_objective(
             fname=fname,
             num_islands=isl,
@@ -65,6 +69,7 @@ def variable_propulate():
         MPI.COMM_WORLD.Barrier()
 
         if rank == 0:
+            print(f"time taken: {time.perf_counter() - t1}")
             # print(best)
             print(f"Finished islands: {isl}\tmigration: {mig}\tpollination: {pol}\tmate_prob: "
                   f"{mate}\tmut_prob: {mut}\trand_prob: {rand}")
@@ -113,10 +118,11 @@ def main():
     seed = job_id  # int(os.environ["SEED"])
     #int(job_id) + os.getpid()
     fname = os.environ["FNAME"]
-    n_trials = int(os.environ["EVALS_PER_WORKER"])
+    n_trials = 256  # int(os.environ["EVALS_PER_WORKER"])
     framework=os.environ["FRAMEWORK"]
-
-    print(f"framework: {framework} function: {fname}\ttrials: {n_trials}\tseed: {seed}")
+    
+    if rank == 0:
+        print(f"framework: {framework} function: {fname}\ttrials: {n_trials}\tseed: {seed}")
     if framework == "propulate":
         return optimize_propulate()
     elif framework == "propulate-scan":
@@ -131,9 +137,11 @@ def main():
     host = os.environ["SLURM_SRUN_COMM_HOST"]  #SLURM_LAUNCH_NODE_IPADDR"]  # "localhost"
 
     #sampler = optuna.samplers.CmaEsSampler(seed=seed)
+    seed = seed #* int(os.environ["STUDDY_NUMBER"])
+    print(f"seed: {seed}")
     sampler = optuna.samplers.TPESampler(seed=seed)
 
-    if rank == 0:
+    if rank == -1:
         optuna.create_study(
             study_name=f"{fname}-{seed}",  # "sphere", 
             storage=f"mysql://root:1234@{host}/{storage}", 
@@ -143,10 +151,14 @@ def main():
     MPI.COMM_WORLD.Barrier()
 
     start_time = time.perf_counter()
+
+    time.sleep(rank / 10)
+
+    #storage = optuna.storages.RDBStorage(f"mysql://root:1234@{host}/{storage}", engine_kwargs={"pool_size": 0, })  # {"poolclass": NullPool}) 
     
     study = optuna.load_study(
         study_name=f"{fname}-{seed}",  # "sphere",
-        storage=f"mysql://root:1234@{host}/{storage}",
+        storage=f"mysql://root:1234@{host}/{fname}_{seed}",  #{storage}",
         sampler=sampler,
     )
 

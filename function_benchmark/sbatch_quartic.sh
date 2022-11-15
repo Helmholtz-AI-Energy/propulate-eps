@@ -5,13 +5,15 @@
 #SBATCH --ntasks-per-node=72
 ## #SBATCH --gpus-per-task=0
 #SBATCH --time=47:00:00
-#SBATCH --partition=cpuonly
+###SBATCH --partition=cpuonly
+#SBATCH --partition=accelerated
+#SBATCH --gres gpu:1
 #SBATCH --account=haicore-project-scc
 
 ###SBATCH --job-name=optuna-quartic
 ###SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/quartic/optuna-%j.out"
-#SBATCH --job-name=propulate-quartice-islands36
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/quartic/propulate-2-islands36-%j.out"
+#SBATCH --job-name=propulate-quartice-424242
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/quartic/propulate-2-424242-%j.out"
 
 ml purge
 
@@ -37,7 +39,7 @@ touch "$SQL_SOCKET"
 #export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_SOCKET_DIR="${BASE_DIR}bigearthnet_kit/mysql/"
 
-export SEED=42
+export SEED=424242
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"

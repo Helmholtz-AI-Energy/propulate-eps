@@ -5,13 +5,15 @@
 #SBATCH --ntasks-per-node=72
 #SBATCH --gpus-per-task=0
 #SBATCH --time=47:00:00
-#SBATCH --partition=cpuonly
+####SBATCH --partition=cpuonly
+#SBATCH --partition=accelerated
+#SBATCH --gres=gpu:1
 #SBATCH --account=haicore-project-scc
 
 # #SBATCH --job-name=optuna-rastrigin
 # #SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/optuna-%j.out"
-#SBATCH --job-name=propulate-rastrigin-islands36
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/propulate-2-islands36-%j.out"
+#SBATCH --job-name=propulate-rastrigin-424242
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/propulate-2-424242-%j.out"
 
 ml purge
 
