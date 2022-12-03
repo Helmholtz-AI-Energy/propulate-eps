@@ -1,0 +1,14 @@
+[client]
+user=root
+socket=/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/mysqlconfs/griewank.sock
+
+[mysqld]
+datadir=/hkfs/work/workspace/scratch/qv2382-propulate/sqldata/griewank/
+socket=/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/mysqlconfs/griewank.sock
+tmpdir=/tmp
+log-error=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/var/log/mysql/griewank_error.log
+pid-file=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/griewank_mysql.pid
+tmp_table_size = 536870912
+max_heap_table_size = 536870912
+max_connections = 500
+max_user_connections = 500

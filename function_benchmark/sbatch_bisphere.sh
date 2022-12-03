@@ -33,7 +33,7 @@ export EVALS_PER_WORKER=256
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
 export BASE_DIR="/hkfs/work/workspace/scratch/qv2382-propulate/"
 
-export SQL_DATA_DIR="${BASE_DIR}sqldata/optuna"
+export SQL_DATA_DIR="${BASE_DIR}sqldata/${FNAME}"
 export SQL_CONFIG="${BASE_DIR}exps/function_benchmark/mysqlconfs/bisphere.cnf"
 #export SQL_SOCKET="${BASE_DIR}mysqld.sock"
 export SQL_SOCKET="${BASE_DIR}exps/function_benchmark/mysqlconfs/bisphere.sock"
