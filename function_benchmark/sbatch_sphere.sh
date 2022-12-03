@@ -2,17 +2,17 @@
 
 # Slurm job configuration
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=72
+#SBATCH --ntasks-per-node=76
 #SBATCH --gpus-per-task=0
-#SBATCH --time=2:00:00
-#SBATCH --partition=accelerated
-#SBATCH --gres gpu:1
+#SBATCH --time=4:00:00
+#SBATCH --partition=cpuonly
+###SBATCH --gres gpu:1
 #SBATCH --account=haicore-project-scc
 
 #SBATCH --job-name=optuna-sphere
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/sphere/optuna-%j.out"
-## #SBATCH --job-name=propulate-sphere
-## #SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/sphere/propulate-%j.out"
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/paper/sphere/optuna-%j.out"
+##SBATCH --job-name=propulate-sphere
+##SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/paper/sphere/propulate-%j.out"
 
 ml purge
 
@@ -32,6 +32,10 @@ export EVALS_PER_WORKER=256
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
 export BASE_DIR="/hkfs/work/workspace/scratch/qv2382-propulate/"
 
+rm "/hkfs/work/workspace/scratch/qv2382-bigearthnet/mysqld.sock*"
+rm "/hkfs/work/workspace/scratch/qv2382-propulate/mysqld.sock*"
+rm "/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/var/run/mysqld/mysqld.sock*"
+
 export SQL_DATA_DIR="${BASE_DIR}sqldata/optuna"
 export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_SOCKET="${BASE_DIR}mysqld.sock"
@@ -40,7 +44,7 @@ touch "$SQL_SOCKET"
 #export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_SOCKET_DIR="${BASE_DIR}bigearthnet_kit/mysql/"
 
-export SEED="${RANDOM}"
+#export SEED="${RANDOM}"
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"
