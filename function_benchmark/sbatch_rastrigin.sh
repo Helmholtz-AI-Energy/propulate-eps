@@ -2,18 +2,18 @@
 
 # Slurm job configuration
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=72
-#SBATCH --gpus-per-task=0
-#SBATCH --time=47:00:00
-####SBATCH --partition=cpuonly
-#SBATCH --partition=accelerated
-#SBATCH --gres=gpu:1
+#SBATCH --ntasks-per-node=76
+##SBATCH --gpus-per-task=0
+#SBATCH --time=12:00:00
+#SBATCH --partition=cpuonly
+####SBATCH --partition=accelerated
+####SBATCH --gres=gpu:1
 #SBATCH --account=haicore-project-scc
 
-# #SBATCH --job-name=optuna-rastrigin
-# #SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/optuna-%j.out"
-#SBATCH --job-name=propulate-rastrigin-424242
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/rastrigin/propulate-2-424242-%j.out"
+#SBATCH --job-name=optuna-rastrigin
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/paper/rastrigin/optuna-%j.out"
+###SBATCH --job-name=propulate-rastrigin
+###SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/paper/rastrigin/propulate-%j.out"
 
 ml purge
 
@@ -26,8 +26,9 @@ SRUN_PARAMS=(
 #  --cpu-bind="ldoms"
 )
 #export FRAMEWORK="optuna"
-export FRAMEWORK="propulate-scan"
-export EVALS_PER_WORKER=100
+export FRAMEWORK="propulate"
+export EVALS_PER_WORKER=256
+rm "/hkfs/work/workspace/scratch/qv2382-bigearthnet/mysqld.sock*"
 
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
 export BASE_DIR="/hkfs/work/workspace/scratch/qv2382-propulate/"
@@ -40,7 +41,7 @@ touch "$SQL_SOCKET"
 #export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_SOCKET_DIR="${BASE_DIR}bigearthnet_kit/mysql/"
 
-export SEED=42
+#export SEED=42
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"

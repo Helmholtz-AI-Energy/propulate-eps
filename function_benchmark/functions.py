@@ -342,7 +342,8 @@ def propulate_objective(
 
     num_gens = 256
 
-    rng = random.Random(int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
+    #rng = random.Random(int(os.environ["SLURM_JOBID"]) + MPI.COMM_WORLD.rank)
+    rng = random.Random(int(os.environ["SEED"]) + MPI.COMM_WORLD.rank)
 
     propagator = get_default_propagator(
         pop_size=pop_size,
@@ -367,12 +368,12 @@ def propulate_objective(
         pollination=pollination,
     )
 
-    full_dict_loc = Path(
-        f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
-        f"search/{fname}/results/overall/"
-    )
-    full_dict_loc.mkdir(exist_ok=True, parents=True)
-    full_dict = full_dict_loc / "search_results-3.txt"
+    #full_dict_loc = Path(
+    #    f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"
+    #    f"search/{fname}/results/overall/"
+    #)
+    #full_dict_loc.mkdir(exist_ok=True, parents=True)
+    #full_dict = full_dict_loc / "search_results-3.txt"
 
     out_loc = Path(
         f"/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/"

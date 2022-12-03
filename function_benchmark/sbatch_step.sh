@@ -2,17 +2,17 @@
 
 # Slurm job configuration
 #SBATCH --nodes=2
-#SBATCH --ntasks-per-node=72
+#SBATCH --ntasks-per-node=76
 #SBATCH --gpus-per-task=0
-#SBATCH --time=2:00:00
-#SBATCH --partition=accelerated
-#SBATCH --gres=gpu:1
+#SBATCH --time=4:00:00
+#SBATCH --partition=cpuonly
+## #SBATCH --gres=gpu:1
 #SBATCH --account=haicore-project-scc
 
 #SBATCH --job-name=optuna-step
-#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/step/optuna-%j.out"
-## #SBATCH --job-name=propulate-step
-## #SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/step/propulate-%j.out"
+#SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/paper/step/optuna-%j.out"
+###SBATCH --job-name=propulate-step
+###SBATCH --output="/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/logs/paper/step/propulate-%j.out"
 
 ml purge
 
@@ -26,6 +26,7 @@ SRUN_PARAMS=(
 )
 export FRAMEWORK="optuna"
 export EVALS_PER_WORKER=256
+rm "/hkfs/work/workspace/scratch/qv2382-bigearthnet/mysqld.sock*"
 
 export DATA_DIR="/hkfs/work/workspace/scratch/qv2382-bigearthnet/"
 export BASE_DIR="/hkfs/work/workspace/scratch/qv2382-propulate/"
@@ -38,7 +39,7 @@ touch "$SQL_SOCKET"
 #export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_SOCKET_DIR="${BASE_DIR}bigearthnet_kit/mysql/"
 
-export SEED="${RANDOM}"
+#export SEED="${RANDOM}"
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"

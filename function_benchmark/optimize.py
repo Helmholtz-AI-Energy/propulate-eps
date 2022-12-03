@@ -115,10 +115,10 @@ def main():
     rank = MPI.COMM_WORLD.rank
 
     job_id = int(os.environ["SLURM_JOBID"])
-    seed = job_id  # int(os.environ["SEED"])
+    seed = int(os.environ["SEED"])
     #int(job_id) + os.getpid()
     fname = os.environ["FNAME"]
-    n_trials = 256  # int(os.environ["EVALS_PER_WORKER"])
+    n_trials = int(os.environ["EVALS_PER_WORKER"])
     framework=os.environ["FRAMEWORK"]
     
     if rank == 0:
@@ -152,13 +152,13 @@ def main():
 
     start_time = time.perf_counter()
 
-    time.sleep(rank / 10)
+    #time.sleep(rank / 10)
 
     #storage = optuna.storages.RDBStorage(f"mysql://root:1234@{host}/{storage}", engine_kwargs={"pool_size": 0, })  # {"poolclass": NullPool}) 
     
     study = optuna.load_study(
-        study_name=f"{fname}-{seed}",  # "sphere",
-        storage=f"mysql://root:1234@{host}/{fname}_{seed}",  #{storage}",
+        study_name=f"{fname}-{job_id}",  # "sphere",
+        storage=f"mysql://root:1234@{host}/{fname}_{job_id}",  #{storage}",
         sampler=sampler,
     )
 
