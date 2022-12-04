@@ -31,24 +31,12 @@ export BASE_DIR="/hkfs/work/workspace/scratch/qv2382-propulate/"
 
 export SQL_DATA_DIR="${BASE_DIR}sqldata/${FNAME}"
 export SQL_CONFIG="${BASE_DIR}exps/function_benchmark/mysqlconfs/${FNAME}.cnf"
-#export SQL_SOCKET="${BASE_DIR}exps/function_benchmark/mysqlconfs/${FNAME}-dir/${FNAME}.sock"
 export SQL_SOCKET="${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/var/run/mysqld/mysqld.sock"
 
 mkdir "${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/var/run/mysqld/"
 rm "${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/var/run/mysqld/*"
-#export SQL_SOCKET_DIR="${BASE_DIR}exps/function_benchmark/mysqlconfs/${FNAME}-dir/"
-
-#echo $SQL_SOCKET_DIR
-#rm "$SQL_SOCKET" "$SQL_SOCKET.lock"
-#touch "$SQL_SOCKET"
-
 chmod 777 "${BASE_DIR}bigearthnet_kit/mysql/${FNAME}"
-
-#export SQL_DATA_DIR="${BASE_DIR}sqldata/optuna/"
-#export SQL_CONFIG="${BASE_DIR}bigearthnet_kit/my.cnf"
 export SQL_DIR="${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/"
-
-#export SEED="${RANDOM}"
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"

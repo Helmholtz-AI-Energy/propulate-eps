@@ -1,10 +1,10 @@
 [client]
 user=root
-socket=/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/mysqlconfs/quartic.sock
+socket=/var/run/mysqld/mysqld.sock
 
 [mysqld]
 datadir=/hkfs/work/workspace/scratch/qv2382-propulate/sqldata/quartic/
-socket=/hkfs/work/workspace/scratch/qv2382-propulate/exps/function_benchmark/mysqlconfs/quartic.sock
+socket=/var/run/mysqld/mysqld.sock
 tmpdir=/tmp
 log-error=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/var/log/mysql/quartic_error.log
 pid-file=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/quartic_mysql.pid

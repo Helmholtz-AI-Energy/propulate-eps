@@ -32,12 +32,12 @@ export BASE_DIR="/hkfs/work/workspace/scratch/qv2382-propulate/"
 
 export SQL_DATA_DIR="${BASE_DIR}sqldata/${FNAME}"
 export SQL_CONFIG="${BASE_DIR}exps/function_benchmark/mysqlconfs/${FNAME}.cnf"
-export SQL_SOCKET="${BASE_DIR}exps/function_benchmark/mysqlconfs/${FNAME}.sock"
+export SQL_SOCKET="${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/var/run/mysqld/mysqld.sock"
 
-rm "$SQL_SOCKET"
-touch "$SQL_SOCKET"
-
-#export SEED="${RANDOM}"
+mkdir "${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/var/run/mysqld/"
+rm "${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/var/run/mysqld/*"
+chmod 777 "${BASE_DIR}bigearthnet_kit/mysql/${FNAME}"
+export SQL_DIR="${BASE_DIR}bigearthnet_kit/mysql/${FNAME}/"
 
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"
@@ -53,8 +53,11 @@ export NCCL_COLLNET_ENABLE=0
 #singularity instance start --bind ${SQL_DATA_DIR}:/var/lib/mysql --bind ${SQL_SOCKET_DIR}:/run/mysqld "${SINGULARITY_FILE}" mysql
 
 srun "${SRUN_PARAMS[@]}" singularity exec --nv \
-  --bind "${BASE_DIR}","${DATA_DIR}","/scratch","$TMP",${SQL_DATA_DIR}:/var/lib/mysql,${SQL_DIR}:/run/mysqld \
-  --bind "${SQL_DIR}/var/log/mysql/":/var/log/mysql \
+  --bind /hkfs/work/workspace/scratch/qv2382-propulate/ \
+  --bind /hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/rosenbrock/var/lib/mysql/:/var/lib/mysql \
+  --bind /hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/rosenbrock/run/mysqld:/run/mysqld \
+  --bind /hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/rosenbrock/var/log/mysql/:/var/log/mysql \
+  --bind "${DATA_DIR}","/scratch","$TMP" \
   --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/wrapper.py":"/usr/local/lib/python3.8/dist-packages/propulate/wrapper.py" \
   --bind "/hkfs/work/workspace/scratch/qv2382-propulate/propulate/propulate/propulator.py":"/usr/local/lib/python3.8/dist-packages/propulate/propulator.py" \
   ${SINGULARITY_FILE} \
