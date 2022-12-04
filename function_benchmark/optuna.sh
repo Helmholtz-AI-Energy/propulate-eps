@@ -5,7 +5,7 @@ export CUDA_VISIBLE_DEVICES=$SLURM_LOCALID
 #echo "$SLURM_SRUN_COMM_HOST $SLURM_LAUNCH_NODE_IPADDR"
 
 printf 'Start1: %s %s\n' "$(date)"
-
+#chmod -R 777 /var/run/mysqld/mysqld.sock
 #export expid = $((SLURM_JOBID * 1))
 # only need this for optuna...
 if [ "$FRAMEWORK" == "optuna" ]
@@ -14,7 +14,7 @@ then
   then
     echo "$SLURM_SRUN_COMM_HOST $SLURM_LAUNCH_NODE_IPADDR"
     mysqld_safe --defaults-file="$SQL_CONFIG" & #--bind-address $SLURM_LAUNCH_NODE_IPADDR &
-    sleep 5
+    sleep 3
     echo "${FNAME}-${SLURM_JOBID}"
     mysql --defaults-file="$SQL_CONFIG" -e "CREATE DATABASE IF NOT EXISTS ${FNAME}_${SLURM_JOBID}"
     optuna create-study --study-name "${FNAME}-${SLURM_JOBID}" --storage "mysql://root@localhost/${FNAME}_${SLURM_JOBID}"

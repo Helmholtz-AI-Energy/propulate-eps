@@ -39,7 +39,7 @@ rm "$SQL_SOCKET"
 touch "$SQL_SOCKET"
 
 #export SEED="${RANDOM}"
-
+export SQL_DIR="${BASE_DIR}bigearthnet_kit/mysql/"
 CONTAINER_DIR="${BASE_DIR}containers/"
 SINGULARITY_FILE="${CONTAINER_DIR}scratch-tf-sql.sif"
 echo "${SINGULARITY_FILE}"
