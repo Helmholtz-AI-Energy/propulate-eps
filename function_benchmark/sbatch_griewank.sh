@@ -4,8 +4,8 @@
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=76
 ###SBATCH --gpus-per-task=0
-#SBATCH --time=0:10:00
-#SBATCH --partition=dev_cpuonly
+#SBATCH --time=8:00:00
+#SBATCH --partition=cpuonly
 #SBATCH --account=haicore-project-scc
 #### 8hr
 #SBATCH --job-name=optuna-griewank

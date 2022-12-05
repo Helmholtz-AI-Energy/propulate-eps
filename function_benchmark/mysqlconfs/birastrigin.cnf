@@ -3,11 +3,11 @@ user=root
 socket=/var/run/mysqld/mysqld.sock
 
 [mysqld]
-datadir=/hkfs/work/workspace/scratch/qv2382-propulate/sqldata/step/
+datadir=/hkfs/work/workspace/scratch/qv2382-propulate/sqldata/birastrigin/
 socket=/var/run/mysqld/mysqld.sock
 tmpdir=/tmp
-log-error=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/var/log/mysql/step_error.log
-pid-file=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/step_mysql.pid
+log-error=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/var/log/mysql/birastrigin_error.log
+pid-file=/hkfs/work/workspace/scratch/qv2382-propulate/bigearthnet_kit/mysql/birastrigin_mysql.pid
 tmp_table_size = 536870912
 max_heap_table_size = 536870912
 max_connections = 500

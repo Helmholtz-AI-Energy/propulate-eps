@@ -26,7 +26,7 @@ SRUN_PARAMS=(
 #  --cpu-bind="ldoms"
 )
 #export FRAMEWORK="optuna"
-export FRAMEWORK="propulate"
+export FRAMEWORK="optuna"
 export EVALS_PER_WORKER=256
 rm "/hkfs/work/workspace/scratch/qv2382-bigearthnet/mysqld.sock*"
 
